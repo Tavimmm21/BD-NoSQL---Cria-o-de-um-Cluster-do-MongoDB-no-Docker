@@ -1,5 +1,9 @@
 # Banco de Dados NoSQL | Comandos para Criação de um Cluster do MongoDB no Docker
 
+## Integrantes 
+1. Otávio Sant'Anna - RA: 2307343
+2. Vitor Augusto Sant'Anna - RA: 2305610
+
 ## 🚀 Etapas do Projeto
 
 ### 1. Criação dos containers
@@ -94,15 +98,35 @@ db.alunos.insertOne({nome: "Carlos", curso: "Rede de Computadores"})
 db.alunos.find().pretty()
 ```
 
-
-### 5. Simulação de falhas
-- Queda de 1 ou 2 nós secundários: `docker stop mongodb3`
-- Queda do nó primário: `docker stop mongodb1`
-- Reativação para restabelecer maioria: `docker start mongodb3`
-
-### 6. Eleição de novo primário
+### 6. Queda Nó Primário 
+- Nós ativados antes da queda
+```bash
+docker ps
+```
+- Realizando a queda de um nó primário 
+```bash
+docker stop mongodb1
+```
+- Reestabelecendo um nó apenas
+```bash
+docker start mongodb3
+```
+- Verificando a seleção de um novo nó primário
 ```js
 rs.status()
+```
+- Inserindo dados no novo nó primário
+```bash
+docker exec -it mongodb2 mongosh
+```
+```js
+use faculdade 
+```
+```js 
+db.alunos.insertOne({nome: "Amanda", curso: "Sistemas de Informação"})
+```
+```js 
+db.alunos.find().pretty()
 ```
 
 
