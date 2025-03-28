@@ -11,6 +11,11 @@ docker run -d --name mongodb4 -p 27020:27017 mongo mongod --replSet rs0
 ```
 
 ### 2. Inicialização do Replica Set
+- Acessando o terminal do MongoDB
+```bash
+docker exec -it mongodb1 mongosh
+```
+- Inicializando os containers
 ```js
 rs.initiate({
   _id: "rs0",
@@ -22,19 +27,73 @@ rs.initiate({
   ]
 })
 ```
+- Visualizando a estrutura do cluster 
+```js
+rs.status()
+```
 
 ### 3. Inserção de dados no nó primário
+- Criando um banco de dados chamado 'faculdade'
 ```js
 use faculdade
-db.alunos.insertOne({ nome: "Maria", curso: "ADS" })
-db.alunos.find()
+```
+- Inserindo dados no banco de dados 'faculdade'
+```js
+db.alunos.insertMany([
+  {nome: "João", curso: "Banco de Dados"},
+  {nome: "Maria", curso: "Engenharia"},
+  {nome: "Pedro", curso: "Ciência da Computação"}
+]
+```
+- Exibindo os dados presentes no DB 'faculdade'
+```js
+db.alunos.find().pretty()
 ```
 
 ### 4. Verificação da replicação nos nós secundários
+- Acessando o nó secundário
+```bash
+docker exec -it mongodb2 mongosh
+```
+- Habilitando a leitura do nó secundário
 ```js
 rs.secondaryOk()
-db.alunos.find()
 ```
+- Acessando e verificando os dados replicados para o nó secundário
+```js
+use faculdade 
+```
+```js
+db.alunos.find().pretty()
+```
+### 5. Queda Nó Secundário 
+- Nós ativados antes da queda
+```bash
+docker ps
+```
+- Realizando a queda de um nó secundário
+```bash
+docker stop mongodb3
+```
+- Acessando o nó primario
+```bash
+docker exec -it mongodb1 mongosh
+```
+- Verificando se o nó foi desativado
+```js
+rs.status()
+```
+- Inserindo e verificando dados no nó primario
+```js
+use faculdade 
+```
+```js 
+db.alunos.insertOne({nome: "Carlos", curso: "Rede de Computadores"})
+```
+```js 
+db.alunos.find().pretty()
+```
+
 
 ### 5. Simulação de falhas
 - Queda de 1 ou 2 nós secundários: `docker stop mongodb3`
